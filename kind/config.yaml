@@ -1,0 +1,33 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: rasouza.dev
+networking:
+  # Your LAN IP address
+  apiServerAddress: 192.168.50.153
+  # By default the API server listens on a random open port.
+  # You may choose a specific port but probably don't need to in most cases.
+  # Using a random port makes it easier to spin up multiple clusters.
+  apiServerPort: 16443
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      certSANs:
+        - "rasouza.ddns.net"
+        - "k8s.rasouza.dev"
+        - "192.168.50.153"
+  # IP above is needed for local access to the API server
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
